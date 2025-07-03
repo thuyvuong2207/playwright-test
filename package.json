@@ -2,13 +2,19 @@
   "name": "playwright",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "runHomePageChrome": "npx playwright test tests/home-page.spec.ts --project=chromium --config=playwright.config.ts",
+    "runHomePageChromeUI": "npx playwright test tests/home-page.spec.ts --project=chromium --ui --config=playwright.config.ts",
+    "runHomePageFirefox": "npx playwright test tests/home-page.spec.ts --project=firefox --config=playwright.config.ts",
+    "runHomePageFirefoxUI": "npx playwright test tests/home-page.spec.ts --project=firefox --ui --config=playwright.config.ts"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
     "@playwright/test": "^1.53.1",
-    "@types/node": "^24.0.3"
+    "@types/node": "^24.0.3",
+    "@faker-js/faker": "^9.9.0"
   }
 }
