@@ -4,6 +4,11 @@ import { AgeGate } from '../pages/AgeGate';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('https://tokecannabis.breadstackcrm.com/');
+  const ageGate = new AgeGate(page);
+  const isAgeGateVisible = await ageGate.mdlAge.isVisible();
+  if (isAgeGateVisible) {
+    await ageGate.btnYes.click();
+  }
 });
 
 test('Verify Age Gate & Redirect to Home', async ({ page }) => {
@@ -45,23 +50,31 @@ test.only('Verify Phone Number matching with Location', async ({ page }) => {
   const location = await homePage.location.textContent();
 
   switch (location) {
-    case 'Niagara':
+    case 'Toke Niagara':
       expect(phoneNumber?.replace('tel:', "")).toBe('289-296-1227');
-    case 'Toronto':
+      break;
+    case 'Toke Toronto':
       expect(phoneNumber?.replace('tel:', "")).toBe('416-530-7750');
-    case 'St. Catharines':
+      break;
+    case 'Toke St. Catharines':
       expect(phoneNumber?.replace('tel:', "")).toBe('289-362-5885');
-    case 'Hamilton':
+      break;
+    case 'Toke Hamilton':
       expect(phoneNumber?.replace('tel:', "")).toBe('289-389-1885');
-    case 'Welland':
+      break;
+    case 'Toke Welland':
       expect(phoneNumber?.replace('tel:', "")).toBe('289-820-7464');
-    case 'Oakwood':
+      break;
+    case 'Toke Oakwood':
       expect(phoneNumber?.replace('tel:', "")).toBe('416-787-1792');
-    case 'Beamsville':
+      break;
+    case 'Toke Beamsville':
       expect(phoneNumber?.replace('tel:', "")).toBe('289-566-8474');
-    case 'Midland':
+      break;
+    case 'Toke Midland':
       expect(phoneNumber?.replace('tel:', "")).toBe('705-527-6728');
+      break;
     // default:
     //   throw Error(`Unexpected location: "${location}"`);
   }
-})
+});
