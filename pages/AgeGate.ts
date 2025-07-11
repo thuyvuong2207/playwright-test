@@ -9,6 +9,9 @@ export class AgeGate {
   readonly msgError: Locator;
   readonly headerHome: Locator;
   readonly headerTitle: Locator;
+  readonly mdlLocation: Locator;
+  readonly btnPickUp: Locator;
+  readonly btnRadioLocation: (id: string) => Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -19,5 +22,8 @@ export class AgeGate {
     this.msgError = page.locator('#err-msg-age');
     this.headerHome = page.locator('.header-nav li').first();
     this.headerTitle = page.locator('.logo a');
+    this.mdlLocation = page.locator('cova-stores');
+    this.btnPickUp = page.getByRole('button', { name: ' Pickup'});
+    this.btnRadioLocation = (id: string) => page.locator(`input[type="radio"][id="${id}"]`).first();
   }
 }

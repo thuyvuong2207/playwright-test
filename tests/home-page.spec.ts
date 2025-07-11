@@ -4,12 +4,17 @@ import { AgeGate } from '../pages/AgeGate';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('https://tokecannabis.breadstackcrm.com/');
+  await page.setViewportSize({ width: 1920, height: 1080 });
   const ageGate = new AgeGate(page);
-  const isAgeGateVisible = await ageGate.mdlAge.isVisible();
-  if (isAgeGateVisible) {
-    await ageGate.btnYes.click();
-  }
-});
+  await ageGate.mdlAge.isVisible();
+  await ageGate.btnYes.waitFor({ state: 'visible' });
+  await ageGate.btnYes.click();
+  await ageGate.btnPickUp.waitFor({ state: 'visible', timeout: 10000 });
+  await ageGate.btnPickUp.click();
+  await ageGate.btnRadioLocation('toke-niagara').waitFor({ state: 'visible', timeout: 5000 });
+  await ageGate.btnRadioLocation('toke-niagara').click();
+}
+);
 
 test('Verify Age Gate & Redirect to Home', async ({ page }) => {
   const ageGate = new AgeGate(page);
@@ -44,37 +49,36 @@ test('Verify Header Bottom Categories', async ({ page }) => {
   expect(actualHeaderCategory).toEqual(expectedHeaderCategory);
 });
 
-test.only('Verify Phone Number matching with Location', async ({ page }) => {
+test('Verify Phone Number matching with Location', async ({ page }) => {
+  const ageGate = new AgeGate(page);
   const homePage = new HomePage(page);
-  const phoneNumber = await homePage.phoneNumber.getAttribute('href');
-  const location = await homePage.location.textContent();
+  const testCases = [
+    { id: 'toke-niagara', location: 'Toke Niagara', phone: '289-296-1227' },
+    { id: 'toke-toronto', location: 'Toke Toronto', phone: '416-530-7750' },
+    { id: 'toke-st-catharines', location: 'Toke St Catharines', phone: '289-362-5885' },
+    { id: 'toke-hamilton', location: 'Toke Hamilton', phone: '289-389-1885' },
+    { id: 'toke-welland', location: 'Toke Welland', phone: '289-820-7464' },
+    { id: 'toke-oakwood', location: 'Toke Oakwood', phone: '416-787-1792' },
+    { id: 'toke-beamsville', location: 'Toke Beamsville', phone: '289-566-8474' },
+    { id: 'toke-midland', location: 'Toke Midland', phone: '705-527-6728' },
+  ];
 
-  switch (location) {
-    case 'Toke Niagara':
-      expect(phoneNumber?.replace('tel:', "")).toBe('289-296-1227');
-      break;
-    case 'Toke Toronto':
-      expect(phoneNumber?.replace('tel:', "")).toBe('416-530-7750');
-      break;
-    case 'Toke St. Catharines':
-      expect(phoneNumber?.replace('tel:', "")).toBe('289-362-5885');
-      break;
-    case 'Toke Hamilton':
-      expect(phoneNumber?.replace('tel:', "")).toBe('289-389-1885');
-      break;
-    case 'Toke Welland':
-      expect(phoneNumber?.replace('tel:', "")).toBe('289-820-7464');
-      break;
-    case 'Toke Oakwood':
-      expect(phoneNumber?.replace('tel:', "")).toBe('416-787-1792');
-      break;
-    case 'Toke Beamsville':
-      expect(phoneNumber?.replace('tel:', "")).toBe('289-566-8474');
-      break;
-    case 'Toke Midland':
-      expect(phoneNumber?.replace('tel:', "")).toBe('705-527-6728');
-      break;
-    // default:
-    //   throw Error(`Unexpected location: "${location}"`);
+  for (const testCase of testCases) {
+    await homePage.location.waitFor({ state: 'visible' });
+    await homePage.location.click();
+    await ageGate.btnPickUp.waitFor({ state: 'visible', timeout: 10000 });
+    await ageGate.btnPickUp.click();
+    await ageGate.btnRadioLocation(testCase.id).waitFor({ state: 'visible', timeout: 5000 });
+    await ageGate.btnRadioLocation(testCase.id).click();
+    
+    await homePage.location.waitFor({ state: 'visible' });
+    await homePage.headerNavFirst.waitFor({ state: 'visible' });
+    await homePage.phoneNumber.waitFor({ state: 'visible' });
+    await page.waitForLoadState('networkidle');
+    const phoneNumber = (await homePage.getPhoneNumber())?.trim();
+    const location = (await homePage.getLocationText())?.trim();
+    expect(location).toEqual(testCase.location);
+    expect(phoneNumber).toEqual(testCase.phone);
+    await page.reload();
   }
 });
