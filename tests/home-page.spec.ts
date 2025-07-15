@@ -38,15 +38,31 @@ test('Verify Age Gate & Redirect to Home', async ({ page }) => {
 test('Verify Header Navigation Items', async ({ page }) => {
   const homePage = new HomePage(page);
   const actualHeaderItems = await homePage.getHeaderItemText();
-  const expectedHeaderItems = ['Home', 'Shop', "Locations", "About", 'Contact Us', 'Resources'];
-  expect(actualHeaderItems).toEqual(expectedHeaderItems);
+  expect(actualHeaderItems).toEqual(homePage.expectedHeaderItems);
 });
 
 test('Verify Header Bottom Categories', async ({ page }) => {
   const homePage = new HomePage(page);
   const actualHeaderCategory = await homePage.getHeaderCategoryText();
-  const expectedHeaderCategory = ['Flower', 'Pre-Rolls', "Infused Pre-Rolls & Flower", "Concentrates", 'Vaporizers', 'Extracts Ingested', 'Edibles', 'Beverages', 'Topicals', 'Accessories', 'Merchandise', 'SALE'];
-  expect(actualHeaderCategory).toEqual(expectedHeaderCategory);
+  expect(actualHeaderCategory).toEqual(homePage.expectedHeaderCategory);
+});
+
+test('Verify Footer credit and link', async ({ page }) => {
+  const homePage = new HomePage(page);
+  await homePage.copyrightFooter.waitFor({ state: 'visible' });
+  expect(await homePage.copyrightFooter.textContent()).toContain('Copyright ©  2025 Cannabis Dispensary - tokecannabis.com. All Rights Reserved.');
+  await homePage.breadstackCredit.waitFor({ state: 'visible' });
+  expect(await homePage.breadstackCredit.textContent()).toContain('Dispensary eCommerce');
+  expect(await homePage.breadstackCreditURL.getAttribute('href')).toBe(homePage.expectedBreadstackCreditURL);  
+})
+
+test('Verify button Create Account functionality - Not logged in', async ({ page }) => {
+  const homePage = new HomePage(page);
+  await homePage.btnCreateAccount.waitFor({ state: 'visible' });
+  const actualDropdowOptions = (await homePage.getCreateAccountDropdownOptions()).map(opt => opt.trim());
+  homePage.expectedCreateAccountDropdownOptions.forEach(option => {
+    expect(actualDropdowOptions).toContain(option);
+  });
 });
 
 test('Verify Phone Number matching with Location', async ({ page }) => {
